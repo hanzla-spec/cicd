@@ -16,7 +16,4 @@ jobs:
           JENKINS_API_TOKEN: ${{ secrets.JENKINS_TOKEN }}
           JENKINS_USER: ${{ secrets.JENKINS_USER }}
         run: |
-          $response = Invoke-WebRequest -Uri "$env:JENKINS_URL/crumbIssuer/api/json" -UseDefaultCredentials
-          $crumb = ($response.Content | ConvertFrom-Json).crumb
-          $crumbHeader = ($response.Content | ConvertFrom-Json).crumbRequestField
-          Invoke-WebRequest -Uri "$env:JENKINS_URL/job/firstjob/build" -Method Post -Headers @{ $crumbHeader = $crumb } -UseDefaultCredentials
+          Invoke-WebRequest -Uri "${{ secrets.JENKINS_URL }}/job/firstjob/build" -Method Post -Credential (New-Object PSCredential("${{ secrets.JENKINS_USER }}", (ConvertTo-SecureString "${{ secrets.JENKINS_TOKEN }}" -AsPlainText -Force)))
