@@ -15,4 +15,4 @@ jobs:
           JEN_URL: ${{ secrets.JENKINS_URL }}
           JEN_TOKEN: ${{ secrets.JENKINS_TOKEN }}
         run:
-          echo {{ JEN_URL }}
+          echo $JEN_URL/build
