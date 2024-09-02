@@ -1,5 +1,5 @@
 name: Trigger Jenkins Job
-
+# comment added
 on:
   push:
     branches:
@@ -10,30 +10,10 @@ jobs:
   trigger-jenkins:
     runs-on: self-hosted
     steps:
-      - name: Fetch Jenkins Crumb
-        id: crumb
-        env:
-          JENKINS_URL: ${{ secrets.JENKINS_URL }}
-          JENKINS_USER: ${{ secrets.JENKINS_USER }}
-          JENKINS_API_TOKEN: ${{ secrets.JENKINS_TOKEN }}
-        run: |
-          # PowerShell script to fetch the crumb and crumb field
-          $crumbResponse = Invoke-WebRequest -Uri "$env:JENKINS_URL/crumbIssuer/api/json" -Credential (New-Object PSCredential("$env:JENKINS_USER", (ConvertTo-SecureString "$env:JENKINS_API_TOKEN" -AsPlainText -Force)))
-          $crumb = ($crumbResponse.Content | ConvertFrom-Json).crumb
-          $crumbField = ($crumbResponse.Content | ConvertFrom-Json).crumbRequestField
-
-          # Export crumb and crumb field as environment variables
-          echo "CRUMB=$crumb" >> $GITHUB_ENV
-          echo "CRUMB_FIELD=$crumbField" >> $GITHUB_ENV
-
       - name: Trigger Jenkins Job
         env:
           JENKINS_URL: ${{ secrets.JENKINS_URL }}
-          JENKINS_USER: ${{ secrets.JENKINS_USER }}
           JENKINS_API_TOKEN: ${{ secrets.JENKINS_TOKEN }}
-          CRUMB: ${{ secrets.CRUMB }}
-          CRUMB_FIELD: ${{ secrets.CRUMB_FIELD }}
+          JENKINS_USER: ${{ secrets.JENKINS_USER }}
         run: |
-          # PowerShell script to trigger Jenkins job using the crumb
-          $headers = @{ $env:CRUMB_FIELD = $env:CRUMB }
-          Invoke-WebRequest -Uri "$env:JENKINS_URL/job/firstjob/build" -Method Post -Headers $headers -Credential (New-Object PSCredential("$env:JENKINS_USER", (ConvertTo-SecureString "$env:JENKINS_API_TOKEN" -AsPlainText -Force)))
+          curl.exe -u "${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }}" -X POST "${{ secrets.JENKINS_URL }}/job/firstjob/build"
