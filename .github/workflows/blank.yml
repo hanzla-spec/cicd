@@ -1,5 +1,5 @@
 name: Trigger Jenkins Job
-# comment added
+
 on:
   push:
     branches:
@@ -10,10 +10,22 @@ jobs:
   trigger-jenkins:
     runs-on: self-hosted
     steps:
+      - name: Fetch Jenkins Crumb
+        id: crumb
+        env:
+          JENKINS_URL: ${{ secrets.JENKINS_URL }}
+          JENKINS_USER: ${{ secrets.JENKINS_USER }}
+          JENKINS_API_TOKEN: ${{ secrets.JENKINS_TOKEN }}
+        run: |
+          curl.exe -s -u $JENKINS_USER:$JENKINS_API_TOKEN "$JENKINS_URL/crumbIssuer/api/json" | jq -r '.crumb' > crumb.txt
+          curl.exe -s -u $JENKINS_USER:$JENKINS_API_TOKEN "$JENKINS_URL/crumbIssuer/api/json" | jq -r '.crumbRequestField' > crumb_field.txt
+          echo "CRUMB=$(cat crumb.txt)" >> $GITHUB_ENV
+          echo "CRUMB_FIELD=$(cat crumb_field.txt)" >> $GITHUB_ENV
+
       - name: Trigger Jenkins Job
         env:
           JENKINS_URL: ${{ secrets.JENKINS_URL }}
-          JENKINS_API_TOKEN: ${{ secrets.JENKINS_TOKEN }}
           JENKINS_USER: ${{ secrets.JENKINS_USER }}
+          JENKINS_API_TOKEN: ${{ secrets.JENKINS_TOKEN }}
         run: |
-          Invoke-WebRequest -Uri "${{ secrets.JENKINS_URL }}/job/firstjob/build" -Method Post -Credential (New-Object PSCredential("${{ secrets.JENKINS_USER }}", (ConvertTo-SecureString "${{ secrets.JENKINS_TOKEN }}" -AsPlainText -Force)))
+          curl.exe -u $JENKINS_USER:$JENKINS_API_TOKEN -X POST "$JENKINS_URL/job/firstjob/build" -H "$CRUMB_FIELD:$CRUMB"
