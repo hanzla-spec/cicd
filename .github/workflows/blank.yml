@@ -16,4 +16,4 @@ jobs:
           JENKINS_API_TOKEN: ${{ secrets.JENKINS_TOKEN }}
           JENKINS_USER: ${{ secrets.JENKINS_USER }}
         run: |
-          curl -u "${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }}" -X POST "${{ secrets.JENKINS_URL }}/job/firstjob/build"
+          Invoke-WebRequest -Uri "${{ secrets.JENKINS_URL }}/job/firstjob/build" -Method Post -Credential (New-Object PSCredential("${{ secrets.JENKINS_USER }}", (ConvertTo-SecureString "${{ secrets.JENKINS_TOKEN }}" -AsPlainText -Force)))
