@@ -1,0 +1,16 @@
+name: Triggered by Dispatch Event
+
+on:
+  repository_dispatch:
+    types: [build-and-deploy-cicd]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Print event payload
+      run: |
+        echo "Branch: ${{ github.event.client_payload.inputs.branch }}"
+        echo "Commit: ${{ github.event.client_payload.inputs.commit }}"
+        echo "Author: ${{ github.event.client_payload.inputs.author }}"
