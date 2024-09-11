@@ -1,19 +1,27 @@
-# .github/workflows/handle-metadata.yml
-
-name: Handle Metadata and Run Script
+name: Build and Deploy
 
 on:
   repository_dispatch:
-    types: [process-metadata]
+    types: [trigger-build-deploy]
 
 jobs:
-  run-script:
-    runs-on: self-hosted  # Use the self-hosted runner
-
+  build_and_deploy:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo2
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Run script
+      - name: Use metadata from api
         run: |
-          echo 'cicd'
+          echo "Branch: ${{ github.event.client_payload.branch }}"
+          echo "Commit: ${{ github.event.client_payload.commit }}"
+
+      - name: Build the project
+        run: |
+          # Add your build commands here
+          echo "Building the project..."
+
+      - name: Deploy the project
+        run: |
+          # Add your deploy commands here
+          echo "Deploying the project..."
