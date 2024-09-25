@@ -15,11 +15,18 @@ on:
 
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
+        
+      - name: Checkout other repository
+        uses: actions/checkout@v2
+        with:
+          repository: hanzla-spec/api
+          path: api
+          token: ${{ secrets.PAT }} 
+          
       - name: Use metadata from api
         run: |
           echo "Branch: ${{ github.event.inputs.branch }}"
