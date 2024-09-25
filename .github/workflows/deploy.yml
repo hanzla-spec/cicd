@@ -25,7 +25,6 @@ jobs:
         with:
           repository: hanzla-spec/api
           path: api
-          token: ${{ secrets.PAT }} 
           
       - name: Use metadata from api
         run: |
